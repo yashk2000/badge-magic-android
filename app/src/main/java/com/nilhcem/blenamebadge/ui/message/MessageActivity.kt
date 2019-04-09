@@ -17,13 +17,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
-import android.widget.ArrayAdapter
-import android.widget.ProgressBar
+import android.widget.*
 import com.nilhcem.blenamebadge.R
 import com.nilhcem.blenamebadge.adapter.DrawableAdapter
 import com.nilhcem.blenamebadge.core.android.ext.showKeyboard
@@ -53,10 +47,9 @@ class MessageActivity : AppCompatActivity() {
     private val speed: Spinner by bindView(R.id.speed)
     private val mode: Spinner by bindView(R.id.mode)
     private val send: Button by bindView(R.id.send_button)
-    private val previewButton: Button by bindView(R.id.preview_button)
-    private val previewButtonDrawable: Button by bindView(R.id.preview_button_drawable)
     private val drawableRecyclerView: RecyclerView by bindView(R.id.recycler_view)
     private val sendByteLoader: ProgressBar by bindView(R.id.sendBytesLoader)
+    private val radio: RadioGroup by  bindView(R.id.radioGroup)
 
     private lateinit var drawableRecyclerAdapter: DrawableAdapter
 
@@ -64,10 +57,17 @@ class MessageActivity : AppCompatActivity() {
 
     private val presenter by lazy { MessagePresenter() }
 
+    private var previewText: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.message_activity)
+        radio.check(R.id.textRadio)
 
+        radio.setOnCheckedChangeListener { group, checkedId ->
+            content.isEnabled = radio.checkedRadioButtonId == R.id.textRadio
+            previewText = radio.checkedRadioButtonId == R.id.textRadio
+        }
         val spinnerItem = R.layout.spinner_item
         speed.adapter = ArrayAdapter<String>(this, spinnerItem, Speed.values().mapIndexed { index, _ -> (index + 1).toString() })
         mode.adapter = ArrayAdapter<String>(this, spinnerItem, Mode.values().map { getString(it.stringResId) })
@@ -90,7 +90,7 @@ class MessageActivity : AppCompatActivity() {
                     }
                 }, SCAN_TIMEOUT_MS)
                 if (content.text.isEmpty()) {
-                    presenter.sendBitmap(this, BitmapFactory.decodeResource(resources, R.drawable.mix2))
+                    presenter.sendMessage(this, convertToDeviceDataModelNull())
                     showLoaderView(true)
                 } else {
                     presenter.sendMessage(this, convertToDeviceDataModel())
@@ -101,7 +101,28 @@ class MessageActivity : AppCompatActivity() {
             }
         }
 
-        previewButton.setOnClickListener {
+        speed.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //do nothing
+            }
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                updatePreview()
+            }
+        }
+
+        mode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //do nothing
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                updatePreview()
+            }
+        }
+
+
+
+        /*previewButton.setOnClickListener {
             val (valid, textToSend) = presenter.convertToPreview(if (!content.text.isEmpty()) content.text.toString() else " ")
             if (!valid) {
                 Toast.makeText(baseContext, R.string.character_not_found, Toast.LENGTH_SHORT).show()
@@ -123,9 +144,9 @@ class MessageActivity : AppCompatActivity() {
                         Mode.FIXED
                 )
             }
-        }
+        }*/
 
-        previewButtonDrawable.setOnClickListener {
+        /*previewButtonDrawable.setOnClickListener {
             val selectedItem = drawableRecyclerAdapter.getSelectedItem()
             if (selectedItem != null)
                 previewBadge.setValue(
@@ -143,11 +164,31 @@ class MessageActivity : AppCompatActivity() {
                         Speed.values()[speed.selectedItemPosition],
                         Mode.FIXED
                 )
-        }
+        }*/
 
         setupRecycler()
 
         prepareForScan()
+    }
+
+    private fun updatePreview() {
+        val ledData: List<String>
+        if (previewText) {
+            val (valid, textToSend) = presenter.convertToPreview(if (!content.text.isEmpty()) content.text.toString() else " ")
+            if (!valid) {
+                Toast.makeText(baseContext, R.string.character_not_found, Toast.LENGTH_SHORT).show()
+            }
+            ledData = textToSend
+        } else {
+            ledData = Converters.convertDrawableToLEDHex((drawableRecyclerAdapter.getSelectedItem() as DrawableInfo).image) as java.util.ArrayList<String>
+        }
+        previewBadge.setValue(
+                ledData,
+                marquee.isChecked,
+                flash.isChecked,
+                Speed.values()[speed.selectedItemPosition],
+                Mode.values()[mode.selectedItemPosition]
+        )
     }
 
     private fun setupRecycler() {
@@ -244,6 +285,10 @@ class MessageActivity : AppCompatActivity() {
 
     private fun convertToDeviceDataModel(): DataToSend {
         return DataToSend(listOf(Message(content.text.trim().toString(), flash.isChecked, marquee.isChecked, Speed.values()[speed.selectedItemPosition], Mode.values()[mode.selectedItemPosition])))
+    }
+
+    private fun convertToDeviceDataModelNull(): DataToSend {
+        return DataToSend(listOf(Message("", flash.isChecked, marquee.isChecked, Speed.values()[speed.selectedItemPosition], Mode.values()[mode.selectedItemPosition])))
     }
 
     private fun prepareForScan() {
