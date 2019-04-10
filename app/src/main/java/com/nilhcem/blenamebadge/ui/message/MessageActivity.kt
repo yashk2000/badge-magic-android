@@ -15,6 +15,8 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -30,6 +32,7 @@ import com.nilhcem.blenamebadge.device.model.Mode
 import com.nilhcem.blenamebadge.device.model.Speed
 import com.nilhcem.blenamebadge.ui.badge_preview.PreviewBadge
 import com.nilhcem.blenamebadge.util.Converters
+import com.nilhcem.blenamebadge.util.RecyclerItemClickListenr
 import java.util.Timer
 import java.util.TimerTask
 
@@ -49,7 +52,7 @@ class MessageActivity : AppCompatActivity() {
     private val send: Button by bindView(R.id.send_button)
     private val drawableRecyclerView: RecyclerView by bindView(R.id.recycler_view)
     private val sendByteLoader: ProgressBar by bindView(R.id.sendBytesLoader)
-    private val radio: RadioGroup by  bindView(R.id.radioGroup)
+    private val radio: RadioGroup by bindView(R.id.radioGroup)
 
     private lateinit var drawableRecyclerAdapter: DrawableAdapter
 
@@ -79,32 +82,46 @@ class MessageActivity : AppCompatActivity() {
 
             if (BluetoothAdapter.getDefaultAdapter().isEnabled) {
                 // Easter egg
-                send.isEnabled = false
-                val buttonTimer = Timer()
-                buttonTimer.schedule(object : TimerTask() {
-                    override fun run() {
-                        runOnUiThread {
-                            send.isEnabled = true
-                            showLoaderView(false)
+                if (!content.text.isEmpty()) {
+                    send.isEnabled = false
+                    val buttonTimer = Timer()
+                    buttonTimer.schedule(object : TimerTask() {
+                        override fun run() {
+                            runOnUiThread {
+                                send.isEnabled = true
+                                showLoaderView(false)
+                            }
                         }
-                    }
-                }, SCAN_TIMEOUT_MS)
-                if (content.text.isEmpty()) {
-                    presenter.sendMessage(this, convertToDeviceDataModelNull())
-                    showLoaderView(true)
-                } else {
+                    }, SCAN_TIMEOUT_MS)
                     presenter.sendMessage(this, convertToDeviceDataModel())
                     showLoaderView(true)
+                } else {
+                    Toast.makeText(this, "Please enter an item to be previewed", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 prepareForScan()
             }
         }
 
+        content.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                updatePreview()
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                ///do nothing
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                //do nothing
+            }
+        })
+
         speed.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 //do nothing
             }
+
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 updatePreview()
             }
@@ -120,7 +137,15 @@ class MessageActivity : AppCompatActivity() {
             }
         }
 
+        drawableRecyclerView.addOnItemTouchListener(RecyclerItemClickListenr(this, drawableRecyclerView, object : RecyclerItemClickListenr.OnItemClickListener {
 
+            override fun onItemClick(view: View, position: Int) {
+                updatePreview()
+            }
+            override fun onItemLongClick(view: View?, position: Int) {
+                //do nothing
+            }
+        }))
 
         /*previewButton.setOnClickListener {
             val (valid, textToSend) = presenter.convertToPreview(if (!content.text.isEmpty()) content.text.toString() else " ")
@@ -180,7 +205,12 @@ class MessageActivity : AppCompatActivity() {
             }
             ledData = textToSend
         } else {
-            ledData = Converters.convertDrawableToLEDHex((drawableRecyclerAdapter.getSelectedItem() as DrawableInfo).image) as java.util.ArrayList<String>
+            val selectedItem = drawableRecyclerAdapter.getSelectedItem()
+            if(selectedItem != null) {
+                ledData = Converters.convertDrawableToLEDHex(selectedItem.image) as java.util.ArrayList<String>
+            } else {
+                ledData = Converters.convertDrawableToLEDHex((drawableRecyclerAdapter.getDefaultItem()).image)
+            }
         }
         previewBadge.setValue(
                 ledData,
