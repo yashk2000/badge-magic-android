@@ -10,12 +10,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import android.widget.ArrayAdapter
-import android.widget.AdapterView
-import android.widget.EditText
-import android.widget.CompoundButton
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 
 import com.nilhcem.blenamebadge.R
 import com.nilhcem.blenamebadge.adapter.DrawableAdapter
@@ -29,11 +27,10 @@ import com.nilhcem.blenamebadge.device.model.Message
 import com.nilhcem.blenamebadge.device.model.Mode
 import com.nilhcem.blenamebadge.device.model.Speed
 import com.nilhcem.blenamebadge.ui.interfaces.PreviewChangeListener
-import com.nilhcem.blenamebadge.util.Converters
-import com.nilhcem.blenamebadge.util.MoshiUtils
-import com.nilhcem.blenamebadge.util.StorageUtils
+import com.nilhcem.blenamebadge.util.*
 import kotlinx.android.synthetic.main.fragment_main_text.*
 import java.text.SimpleDateFormat
+import java.util.ArrayList
 import java.util.Locale
 import java.util.Calendar
 
@@ -188,7 +185,34 @@ class MainTextDrawableFragment : BaseFragment() {
 
         textRadio.isChecked = true
 
+        var rv = view.findViewById(R.id.rvv) as RecyclerView
+
+        val pickerLayoutManager = PickerLayoutManager(context, PickerLayoutManager.HORIZONTAL, false)
+        pickerLayoutManager.setChangeAlpha(true)
+        pickerLayoutManager.setScaleDownBy(0.99f)
+        pickerLayoutManager.setScaleDownDistance(0.8f)
+
+        var adapter = PickerAdapter(context, getData(9), rv)
+        val snapHelper = LinearSnapHelper()
+        snapHelper.attachToRecyclerView(rv)
+        rv.setLayoutManager(pickerLayoutManager)
+        rv.setAdapter(adapter)
+
+        pickerLayoutManager.setOnScrollStopListener(object : PickerLayoutManager.onScrollStopListener {
+            override fun selectedView(view: View) {
+                Toast.makeText(context, "Selected value : " + (view as TextView).text.toString(), Toast.LENGTH_SHORT).show()
+            }
+        })
+
         setupRecycler()
+    }
+
+    fun getData(count: Int): List<String> {
+        val data = ArrayList<String>()
+        for (i in 1 until count) {
+            data.add(i.toString())
+        }
+        return data
     }
 
     private fun setupRecycler() {

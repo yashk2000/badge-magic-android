@@ -111,6 +111,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingLeft="183dp"
+                android:paddingRight="183dp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
