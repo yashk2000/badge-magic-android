@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.content.DialogInterface
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.Editable
@@ -207,7 +208,42 @@ class MainTextDrawableFragment : BaseFragment(), MainTextDrawableNavigator {
         }
 
         val previewCheckedListener: CompoundButton.OnCheckedChangeListener =
-            CompoundButton.OnCheckedChangeListener { _, _ -> setPreview() }
+            CompoundButton.OnCheckedChangeListener { _, _ ->
+
+                effect_flash.background = when {
+                    flash.isChecked -> context?.resources?.getDrawable(R.color.colorAccent)
+                    else -> context?.resources?.getDrawable(android.R.color.transparent)
+                }
+                effect_flash.setColorFilter(when {
+                    flash.isChecked -> context?.resources?.getColor(android.R.color.white)
+                            ?: Color.parseColor("#000000")
+                    else -> context?.resources?.getColor(android.R.color.black)
+                            ?: Color.parseColor("#00000000")
+                })
+
+                effect_marquee.background = when {
+                    marquee.isChecked -> context?.resources?.getDrawable(R.color.colorAccent)
+                    else -> context?.resources?.getDrawable(android.R.color.transparent)
+                }
+                effect_marquee.setColorFilter(when {
+                    marquee.isChecked -> context?.resources?.getColor(android.R.color.white)
+                            ?: Color.parseColor("#000000")
+                    else -> context?.resources?.getColor(android.R.color.black)
+                            ?: Color.parseColor("#00000000")
+                })
+
+                effect_invert.background = when {
+                    invertLED.isChecked -> context?.resources?.getDrawable(R.color.colorAccent)
+                    else -> context?.resources?.getDrawable(android.R.color.transparent)
+                }
+                effect_invert.setColorFilter(when {
+                    invertLED.isChecked -> context?.resources?.getColor(android.R.color.white)
+                            ?: Color.parseColor("#000000")
+                    else -> context?.resources?.getColor(android.R.color.black)
+                            ?: Color.parseColor("#00000000")
+                })
+
+                setPreview() }
         flash.setOnCheckedChangeListener(previewCheckedListener)
         marquee.setOnCheckedChangeListener(previewCheckedListener)
         invertLED.setOnCheckedChangeListener(previewCheckedListener)

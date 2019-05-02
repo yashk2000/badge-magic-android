@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -144,29 +145,94 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <CheckBox
-                            android:id="@+id/flash"
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/spacing_normal"
                             android:layout_weight="1"
-                            android:text="@string/flash" />
+                            android:orientation="vertical">
 
-                        <CheckBox
-                            android:id="@+id/marquee"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/spacing_normal"
-                            android:layout_weight="1"
-                            android:text="@string/marquee" />
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:cardCornerRadius="@dimen/card_radius"
+                                app:cardElevation="@dimen/card_elevation"
+                                app:cardUseCompatPadding="true">
 
-                        <CheckBox
-                            android:id="@+id/invertLED"
+                                <pl.droidsonroids.gif.GifImageView
+                                    android:id="@+id/effect_flash"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:src="@drawable/ic_effect_flash" />
+
+                            </androidx.cardview.widget.CardView>
+
+                            <CheckBox
+                                android:id="@+id/flash"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_normal"
+                                android:text="@string/flash" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/spacing_normal"
                             android:layout_weight="1"
-                            android:text="@string/invertLED" />
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:cardCornerRadius="@dimen/card_radius"
+                                app:cardElevation="@dimen/card_elevation"
+                                app:cardUseCompatPadding="true">
+
+                                <pl.droidsonroids.gif.GifImageView
+                                    android:id="@+id/effect_marquee"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:src="@drawable/ic_effect_marquee" />
+
+                            </androidx.cardview.widget.CardView>
+
+                            <CheckBox
+                                android:id="@+id/marquee"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_normal"
+                                android:text="@string/marquee" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                app:cardCornerRadius="@dimen/card_radius"
+                                app:cardElevation="@dimen/card_elevation"
+                                app:cardUseCompatPadding="true">
+
+                                <pl.droidsonroids.gif.GifImageView
+                                    android:id="@+id/effect_invert"
+                                    android:layout_width="100dp"
+                                    android:layout_height="90dp"
+                                    android:src="@drawable/ic_effect_invert" />
+
+                            </androidx.cardview.widget.CardView>
+
+                            <CheckBox
+                                android:id="@+id/invertLED"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_normal"
+                                android:text="@string/invertLED" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
