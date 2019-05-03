@@ -28,6 +28,7 @@
                 android:id="@+id/about"
                 android:icon="@android:drawable/ic_menu_info_details"
                 android:title="About Us" />
+          
         </menu>
     </item>
 

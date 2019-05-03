@@ -66,7 +66,7 @@ class DrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelec
 
             }
             R.id.about -> {
-
+            
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
