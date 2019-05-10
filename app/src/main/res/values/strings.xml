@@ -82,6 +82,10 @@
     <string name="scanner_github">https://github.com/NordicSemiconductor/Android-Scanner-Compat-Library</string>
     <string name="scanner_copy">Copyright 2015, Nordic Semiconductor</string>
     <string name="licences">Licences Dialog</string>
+    <string name="create_shortcut_long_label">Create Badges</string>
+    <string name="create_shortcut_short_label">Create Badges</string>
+    <string name="saved_shortcut_long_label">Saved Badges</string>
+    <string name="saved_shortcut_short_label">Saved Badges</string>
     <string name="licences_github">https://github.com/PSDev/LicensesDialog</string>
     <string name="licences_copy">Copyright 2013 Philip Schiffer</string>
 
